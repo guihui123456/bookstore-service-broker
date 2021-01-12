@@ -19,7 +19,10 @@ package org.springframework.cloud.sample.bookstore.servicebroker.service;
 import org.springframework.cloud.sample.bookstore.servicebroker.model.ServiceInstance;
 import org.springframework.cloud.sample.bookstore.servicebroker.repository.ServiceInstanceRepository;
 import org.springframework.cloud.sample.bookstore.web.service.BookStoreService;
+import org.springframework.cloud.servicebroker.exception.ServiceBrokerAsyncRequiredException;
+import org.springframework.cloud.servicebroker.exception.ServiceBrokerInvalidParametersException;
 import org.springframework.cloud.servicebroker.exception.ServiceInstanceDoesNotExistException;
+import org.springframework.cloud.servicebroker.exception.ServiceInstanceUpdateNotSupportedException;
 import org.springframework.cloud.servicebroker.model.instance.CreateServiceInstanceRequest;
 import org.springframework.cloud.servicebroker.model.instance.CreateServiceInstanceResponse;
 import org.springframework.cloud.servicebroker.model.instance.CreateServiceInstanceResponse.CreateServiceInstanceResponseBuilder;
@@ -27,10 +30,16 @@ import org.springframework.cloud.servicebroker.model.instance.DeleteServiceInsta
 import org.springframework.cloud.servicebroker.model.instance.DeleteServiceInstanceResponse;
 import org.springframework.cloud.servicebroker.model.instance.GetServiceInstanceRequest;
 import org.springframework.cloud.servicebroker.model.instance.GetServiceInstanceResponse;
+import org.springframework.cloud.servicebroker.model.instance.UpdateServiceInstanceRequest;
+import org.springframework.cloud.servicebroker.model.instance.UpdateServiceInstanceResponse;
 import org.springframework.cloud.servicebroker.service.ServiceInstanceService;
 import org.springframework.stereotype.Service;
 
+import java.security.Policy.Parameters;
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class BookStoreServiceInstanceService implements ServiceInstanceService {
@@ -94,5 +103,29 @@ public class BookStoreServiceInstanceService implements ServiceInstanceService {
 		ServiceInstance serviceInstance = new ServiceInstance(instanceId, request.getServiceDefinitionId(),
 				request.getPlanId(), request.getParameters());
 		instanceRepository.save(serviceInstance);
+		storeService.createBookStore(instanceId);
+	}
+	
+	/**
+	 * Update a service instance.
+	 *
+	 * @param request containing the details of the request
+	 * @return an {@link UpdateServiceInstanceResponse} on successful processing of the request
+	 * @throws ServiceInstanceUpdateNotSupportedException if particular change is not supported
+	 *         or if the request can not currently be fulfilled due to the state of the instance
+	 * @throws ServiceInstanceDoesNotExistException if a service instance with the given ID is not known to the broker
+	 * @throws ServiceBrokerAsyncRequiredException if the broker requires asynchronous processing of the request
+	 * @throws ServiceBrokerInvalidParametersException if any parameters passed in the request are invalid
+	 */
+	@Override
+	public UpdateServiceInstanceResponse updateServiceInstance(UpdateServiceInstanceRequest request) {
+		String planid = request.getPlanId();
+		System.out.println("planid = " + planid);
+		Map<String, Object> parameters = request.getParameters();
+		Set<String> keys = parameters.keySet();
+		Collection<Object> values = parameters.values();
+		throw new UnsupportedOperationException("This service broker does not support updating service instances. " +
+				"The service broker should set 'plan_updateable:false' in the service catalog, " +
+				"or provide an implementation of the update instance API.");
 	}
 }

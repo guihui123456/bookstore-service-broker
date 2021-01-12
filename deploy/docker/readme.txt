@@ -5,4 +5,9 @@
 3、查看所属容器：docker ps -a
 
 4、访问url:  浏览器访问或者CURL -L http://localhost:8080/v2/catalog -u admin:supersecret
+
+5、docker save -o bookstore-broker.tar bookstore:v1
+
+6、最后，把Docker镜像bookstore-broker.tar上传到平台的镜像仓库中。
+
 	
